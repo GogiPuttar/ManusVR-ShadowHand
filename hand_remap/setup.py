@@ -17,8 +17,6 @@ setup(
         (os.path.join('share', package_name, 'launch'), glob('launch/*.py')),
         (os.path.join('share', package_name, 'config'), glob('config/*.yaml')),
         (os.path.join('share', package_name, 'config'), glob('config/*.rviz')),
-        (os.path.join('share', package_name, 'urdf'), glob('urdf/*.xacro')),
-        (os.path.join('share', package_name, 'urdf'), glob('urdf/*.urdf')),
         (os.path.join('share', package_name, 'data'), glob('data/*.csv')),
     ],
     install_requires=['setuptools'],

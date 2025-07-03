@@ -2,7 +2,9 @@ from launch import LaunchDescription
 from launch_ros.actions import Node
 from launch.actions import DeclareLaunchArgument
 from launch.conditions import IfCondition
-from launch.substitutions import LaunchConfiguration
+from launch_ros.substitutions import FindPackageShare
+from launch.substitutions import Command, LaunchConfiguration, PathJoinSubstitution
+from launch_ros.parameter_descriptions import ParameterValue
 import os
 from ament_index_python.packages import get_package_share_directory
 
@@ -14,6 +16,29 @@ def generate_launch_description():
     data_dir = os.path.join(pkg_share, 'data')
 
     use_rviz = LaunchConfiguration('use_rviz')
+
+    # Paths to hand urdf/xacro
+    hand_xacro = PathJoinSubstitution([
+        FindPackageShare('sr_description'),
+        'robots', 'sr_hand.urdf.xacro'
+    ])
+
+    # Generate robot description using hand xacro
+    hand_robot_description = {
+        'robot_description': ParameterValue(
+            Command(['xacro ', hand_xacro]),
+            value_type=str
+        )
+    }
+
+    # Hand robot state publisher
+    hand_rsp = Node(
+        package='robot_state_publisher',
+        executable='robot_state_publisher',
+        name='robot_state_publisher',
+        parameters=[hand_robot_description],
+        output='screen'
+    )
 
     return LaunchDescription([
         DeclareLaunchArgument(
@@ -28,6 +53,7 @@ def generate_launch_description():
             parameters=[{'csv_path': os.path.join(data_dir, 'skeleton_log_20250624_203229.csv')}],
             output='screen'
         ),
+        # hand_rsp,
         # RVIZ
         Node(
             condition=IfCondition(use_rviz),
