@@ -43,13 +43,27 @@
   <xacro:arg name="palm_sensor" default="none"/>
   <xacro:arg name="mounting_plate" default="false"/>
 
-  <link name="world" />
+  <!-- <link name="world" /> -->
+  <link name="base_link" />
+  <link name="reference" />
+  <!-- <link name="manus" /> -->
   <xacro:if value="${'$(arg side)' == 'right'}">
-    <joint name="rh_world_joint" type="fixed">
-      <parent link="world" />
+    <joint name="rh_base_link_joint" type="fixed">
+      <!-- <parent link="world" /> -->
+      <parent link="base_link" />
       <child link="rh_forearm" />
       <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
     </joint>
+    <joint name="rh_reference_joint" type="fixed">
+      <parent link="rh_palm" />
+      <child link="reference" />
+      <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+    </joint>
+    <!-- <joint name="manus_joint" type="fixed">
+      <parent link="reference" />
+      <child link="manus" />
+      <origin xyz="0.2 0.0 0.0" rpy="0.0 0.0 0.0" />
+    </joint> -->
   </xacro:if>
   <xacro:if value="${'$(arg side)' == 'left'}">
     <joint name="lh_world_joint" type="fixed">

@@ -46,14 +46,23 @@ def generate_launch_description():
             default_value='true',
             description='Whether to launch RViz'
         ),
+        DeclareLaunchArgument(
+            'tracking_path',
+            default_value='true',
+            description='Settings for motion tracking'
+        ),
         Node(
             package='hand_remap',
             executable='hand_animator_node',
             name='hand_animator',
-            parameters=[{'csv_path': os.path.join(data_dir, 'skeleton_log_20250624_203229.csv')}],
+            parameters=[{
+                'csv_path': os.path.join(data_dir, 'skeleton_log_20250624_203229.csv'),
+                'tracking_path': os.path.join(config_dir, 'tracking_params.yaml'),
+                **hand_robot_description,
+                }],
             output='screen'
         ),
-        # hand_rsp,
+        hand_rsp,
         # RVIZ
         Node(
             condition=IfCondition(use_rviz),

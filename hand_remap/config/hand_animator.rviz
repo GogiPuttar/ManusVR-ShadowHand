@@ -6,7 +6,6 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /MarkerArray1
       Splitter Ratio: 0.5
     Tree Height: 549
   - Class: rviz_common/Selection
@@ -50,7 +49,7 @@ Visualization Manager:
       Value: true
     - Class: rviz_default_plugins/MarkerArray
       Enabled: true
-      Name: MarkerArray
+      Name: Extracted Positions
       Namespaces:
         "": true
       Topic:
@@ -60,10 +59,327 @@ Visualization Manager:
         Reliability Policy: Reliable
         Value: /hand_markers
       Value: true
+    - Alpha: 1
+      Class: rviz_default_plugins/RobotModel
+      Collision Enabled: false
+      Description File: ""
+      Description Source: Topic
+      Description Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /robot_description
+      Enabled: true
+      Links:
+        All Links Enabled: true
+        Expand Joint Details: false
+        Expand Link Details: false
+        Expand Tree: false
+        Link Tree Style: Links in Alphabetic Order
+        base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        manus:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        reference:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        rh_ffdistal:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        rh_ffknuckle:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        rh_ffmiddle:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        rh_ffproximal:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        rh_fftip:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        rh_forearm:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        rh_imu:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        rh_lfdistal:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        rh_lfknuckle:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        rh_lfmetacarpal:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        rh_lfmiddle:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        rh_lfproximal:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        rh_lftip:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        rh_manipulator:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        rh_mfdistal:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        rh_mfknuckle:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        rh_mfmiddle:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        rh_mfproximal:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        rh_mftip:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        rh_palm:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        rh_rfdistal:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        rh_rfknuckle:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        rh_rfmiddle:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        rh_rfproximal:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        rh_rftip:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        rh_thbase:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        rh_thdistal:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        rh_thhub:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        rh_thmiddle:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        rh_thproximal:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        rh_thtip:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+        rh_wrist:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+      Mass Properties:
+        Inertia: false
+        Mass: false
+      Name: Hand
+      TF Prefix: ""
+      Update Interval: 0
+      Value: true
+      Visual Enabled: true
+    - Class: rviz_default_plugins/TF
+      Enabled: true
+      Frame Timeout: 15
+      Frames:
+        All Enabled: true
+        base_link:
+          Value: true
+        manus:
+          Value: true
+        reference:
+          Value: true
+        rh_ffdistal:
+          Value: true
+        rh_ffknuckle:
+          Value: true
+        rh_ffmiddle:
+          Value: true
+        rh_ffproximal:
+          Value: true
+        rh_fftip:
+          Value: true
+        rh_forearm:
+          Value: true
+        rh_imu:
+          Value: true
+        rh_lfdistal:
+          Value: true
+        rh_lfknuckle:
+          Value: true
+        rh_lfmetacarpal:
+          Value: true
+        rh_lfmiddle:
+          Value: true
+        rh_lfproximal:
+          Value: true
+        rh_lftip:
+          Value: true
+        rh_manipulator:
+          Value: true
+        rh_mfdistal:
+          Value: true
+        rh_mfknuckle:
+          Value: true
+        rh_mfmiddle:
+          Value: true
+        rh_mfproximal:
+          Value: true
+        rh_mftip:
+          Value: true
+        rh_palm:
+          Value: true
+        rh_rfdistal:
+          Value: true
+        rh_rfknuckle:
+          Value: true
+        rh_rfmiddle:
+          Value: true
+        rh_rfproximal:
+          Value: true
+        rh_rftip:
+          Value: true
+        rh_thbase:
+          Value: true
+        rh_thdistal:
+          Value: true
+        rh_thhub:
+          Value: true
+        rh_thmiddle:
+          Value: true
+        rh_thproximal:
+          Value: true
+        rh_thtip:
+          Value: true
+        rh_wrist:
+          Value: true
+      Marker Scale: 0.10000000149011612
+      Name: TF
+      Show Arrows: true
+      Show Axes: true
+      Show Names: false
+      Tree:
+        base_link:
+          rh_forearm:
+            rh_wrist:
+              rh_palm:
+                reference:
+                  manus:
+                    {}
+                rh_ffknuckle:
+                  rh_ffproximal:
+                    rh_ffmiddle:
+                      rh_ffdistal:
+                        rh_fftip:
+                          {}
+                rh_imu:
+                  {}
+                rh_lfmetacarpal:
+                  rh_lfknuckle:
+                    rh_lfproximal:
+                      rh_lfmiddle:
+                        rh_lfdistal:
+                          rh_lftip:
+                            {}
+                rh_manipulator:
+                  {}
+                rh_mfknuckle:
+                  rh_mfproximal:
+                    rh_mfmiddle:
+                      rh_mfdistal:
+                        rh_mftip:
+                          {}
+                rh_rfknuckle:
+                  rh_rfproximal:
+                    rh_rfmiddle:
+                      rh_rfdistal:
+                        rh_rftip:
+                          {}
+                rh_thbase:
+                  rh_thproximal:
+                    rh_thhub:
+                      rh_thmiddle:
+                        rh_thdistal:
+                          rh_thtip:
+                            {}
+      Update Interval: 0
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
-    Fixed Frame: world
+    Fixed Frame: manus
     Frame Rate: 30
   Name: root
   Tools:
@@ -106,14 +422,14 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 0.534165620803833
+      Distance: 0.5796012878417969
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0
+        X: -0.05000000074505806
         Y: 0
         Z: 0
       Focal Shape Fixed Size: true
@@ -121,10 +437,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.31039831042289734
+      Pitch: 0.3297971189022064
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 5.418584823608398
+      Yaw: 5.323584079742432
     Saved: ~
 Window Geometry:
   Displays:
