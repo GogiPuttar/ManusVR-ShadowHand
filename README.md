@@ -19,8 +19,6 @@ ros2 launch hand_remap hand_animator.launch.py csv_filename:=skeleton_log_202506
 https://github.com/user-attachments/assets/04cc70e6-ae19-4ee7-9ca7-9ae67832159a
 
 ## Inverse Kinematics
-- Gives closest IK solutions for points outside the workspace. SCIPY BFGS. Benchmarking not done but performs well so far at 10Hz.
-- Currently, does not care about the pose of the finger, that's why sometimes you see the finger twist around. Joint-wise weighting can be added.
 
 A segment-wise weighted IK solver has been implemented on each finger for generating appropriate joint values, given the scaled Manus VR glove's tracking trajectories.
 
@@ -58,7 +56,7 @@ Therefore, the position only segmentwise IK solver can be defined as the unconst
 
 For each finger,
 
-$\min_{q} Z_{middle}(q) + Z_{distal}(q) + Z_{tip}(q)$
+$\min_{q} w_1 Z_{middle}(q) + w_2 Z_{distal}(q) + w_3 Z_{tip}(q)$
 
 where,
 
@@ -68,11 +66,22 @@ $Z_{distal}(q) = (x_{d,distal} - FK_{distal}(q))^2$,
 
 $Z_{tip}(q) = (x_{d,tip} - FK_{tip}(q))^2$,
 
-are the individual cost functions, and $x_{d,name}$, $FK_{name}(q)$ follow the same logic.
+are the individual cost functions, 
 
-This yields more accurate solutions, which can be tuned to perfect by correctly correlating glove sensors to robot links:
+$w_1, w_2, w_3 \in ℝ$, 
+
+are the respective weights, and $x_{d,name}$, $FK_{name}(q)$ follow the same logic.
+
+This yields more accurate solutions, which can be tuned to perfection by correctly correlating glove sensor positions to robot links:
 
 https://github.com/user-attachments/assets/43832bee-6af8-4fbd-b4e0-add73fe6bdcb
+
+**NOTES:**
+- `scipy.minimize(method=’BFGS’)` has been used for optimization, since it works. No benchmarking has been done but the node seems to work well without any issues at 10Hz.
+- The previous solution `q_seed` is given as the starting solution to the optimizer.
+- A tolerance values is added to account for target positions outside the workspace, which gives us clean reasonable approximations instead of failures.
+- Since the search space is unconstrained, the optimizer has no issues with values outside the workspace due to joint limits, again giving us a clean solution limited by the renderer's (`robot_state_publisher`) joint limits.
+- Since this is position-only, sometimes you see the fingers twisting around which is undesriable. The optimizer can be modified to penalize joint twisting.
 
 # Implementation
 
