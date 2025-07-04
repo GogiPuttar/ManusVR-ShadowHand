@@ -28,11 +28,11 @@ Since each finger of the ShadowHand is 4-5 DoF and the fact that fingertip pose 
 Therefore, `PyKDL`'s builtin IK Solver can't be used directly as it relies on 6-DoF pose commands.
 I've implemented my own IK solver as follows:
 
-### Tip-Only IK:
+### Tip Position-only IK:
 
-Position only IK for the tip is defined as the unconstrained optimization problem:
+Position only IK for the fingertips is defined as the unconstrained optimization problem:
 
-For each finger:
+For each finger,
 
 $\min_{q} Z_{tip}(q)$
 
@@ -42,13 +42,36 @@ $Z_{tip}(q) = (x_{d,tip} - FK_{tip}(q))^2$ is the cost function,
 
 $x_{d,tip} \in ℝ^3$ is the desired fingertip position,
 
-$FK_{tip}(q)$ is the Cartesian Forward Kinematics function for that finger, and
+$FK_{tip}(q)$ is the Cartesian Forward Kinematics function for the respective finger, and
 
-$q \in ℝ^n$ is the vector of joint angles ($n$ is the DoF for that finger).
+$q \in ℝ^n$ is the vector of joint angles ($n$ is the DoF for the respective finger).
+
+As seen below, position only IK for the tip suffers from 1-2 dimensional redundancies, and is therefore unable to accurately represent the tracked positions fully:
 
 https://github.com/user-attachments/assets/ac022014-75cc-446a-8c52-2db2a683cc90
 
-### Segment-wise IK:
+### Segment-wise Position-only IK:
+
+The segment positions provided by the Manus glove can be correlated with existing links on the fingers of the ShadowHand, namely `middle`, `distal`, and `tip` (knuckles are ignored).
+
+Therefore, the position only segmentwise IK solver can be defined as the unconstrained optimization problem:
+
+For each finger,
+
+$\min_{q} Z_{middle}(q) + Z_{distal}(q) + Z_{tip}(q)$
+
+where,
+
+$Z_{middle}(q) = (x_{d,middle} - FK_{middle}(q))^2$,
+
+$Z_{distal}(q) = (x_{d,distal} - FK_{distal}(q))^2$,
+
+$Z_{tip}(q) = (x_{d,tip} - FK_{tip}(q))^2$,
+
+are the individual cost functions, and $x_{d,name}$, $FK_{name}(q)$ follow the same logic.
+
+This yields more accurate solutions, which can be tuned to perfect by correctly correlating glove sensors to robot links:
+
 https://github.com/user-attachments/assets/43832bee-6af8-4fbd-b4e0-add73fe6bdcb
 
 # Implementation
