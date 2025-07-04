@@ -16,9 +16,15 @@ ros2 launch hand_remap hand_animator.launch.py csv_filename:=skeleton_log_202506
 - Assume a transform from Manus VR tracked positions to arbitrary hand's target positions. this must preserve linear combinations. also gives us collinearity, parallelism, fixed origin. all invertible 3x3 transforms. scaling ones used, don't have to tune 9 different values.
 - quaternion formula for manus position chain reconstruction
 
+https://github.com/user-attachments/assets/04cc70e6-ae19-4ee7-9ca7-9ae67832159a
+
 ## Inverse Kinematics
 - Gives closest IK solutions for points outside the workspace. SCIPY BFGS. Benchmarking not done but performs well so far at 10Hz.
 - Currently, does not care about the pose of the finger, that's why sometimes you see the finger twist around. Joint-wise weighting can be added.
+
+### Tip-Only IK:
+
+### Segment-wise IK:
 
 # Implementation
 
@@ -28,6 +34,8 @@ ros2 launch hand_remap hand_animator.launch.py csv_filename:=skeleton_log_202506
 ```
 python3 scripts/animate_skeleton.py data/skeleton_log_20250624_203941.csv
 ```
+
+https://github.com/user-attachments/assets/fdc4988d-ea6c-4606-aa97-6befc9a6492a
 
 ## `hand_remap` package
 
