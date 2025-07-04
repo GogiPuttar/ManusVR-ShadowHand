@@ -3,7 +3,7 @@
 # Overview
 Remapping Manus VR glove motion extraction and remapping to ShadowRobot Dexterous Hand
 
-![](https://github.com/user-attachments/assets/0624f13a-9e5d-4638-8620-6eaa8df2d4e7)
+https://github.com/user-attachments/assets/0624f13a-9e5d-4638-8620-6eaa8df2d4e7
 
 ## Usage
 ```
