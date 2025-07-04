@@ -22,7 +22,38 @@ https://github.com/user-attachments/assets/04cc70e6-ae19-4ee7-9ca7-9ae67832159a
 - Gives closest IK solutions for points outside the workspace. SCIPY BFGS. Benchmarking not done but performs well so far at 10Hz.
 - Currently, does not care about the pose of the finger, that's why sometimes you see the finger twist around. Joint-wise weighting can be added.
 
+A segment-wise weighted IK solver has been implemented on each finger for generating appropriate joint values, given the scaled Manus VR glove's tracking trajectories.
+
+Since each finger of the ShadowHand is 4-5 DoF and the fact that fingertip pose needs to be inferred using position values from the VR glove, it is unreasonable to have 6-DoF $SE(3)$ pose tracking using IK for such a case.
+Therefore, `PyKDL`'s builtin IK Solver can't be used directly as it relies on 6-DoF pose commands.
+I've implemented my own IK solver as follows:
+
 ### Tip-Only IK:
+
+Position only IK for the tip is defined as the unconstrained optimization problem:
+
+For each finger:
+$$
+\min_{q} Z_{tip}
+$$
+where,
+$$
+  Z_{tip} = (x_{d,tip} - FK_{tip}(q))^2
+$$
+is the cost function,
+$$
+  x_{d,tip} \in \real^3
+$$ 
+is the desired fingertip position,
+$$
+  FK_{tip}(q)
+$$
+is the Cartesian Forward Kinematics function for that finger, and
+$$
+  q \in \real^n
+$$
+is the vector of joint angles ($n$ is the DoF for that finger).
+
 https://github.com/user-attachments/assets/ac022014-75cc-446a-8c52-2db2a683cc90
 
 ### Segment-wise IK:
