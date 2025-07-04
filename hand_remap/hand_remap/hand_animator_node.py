@@ -57,7 +57,7 @@ class HandAnimator(Node):
                        ]
 
         self.mode = tracking_config.get('mode', 'IK')
-        self.scaling_factor = tracking_config.get('scaling_factor', 1.0)
+        self.scaling_factor = tracking_config.get('scaling_factor', {})
         self.tuning_mode = tracking_config.get('tuning_mode', False)
         self.reference_to_manus = tracking_config['reference_to_manus']
 
@@ -70,25 +70,52 @@ class HandAnimator(Node):
             self.get_logger().error("Failed to parse URDF into KDL tree")
             return
 
-        self.kdl_chains = {}
-        self.ik_solvers = {}
-        self.fk_solvers = {}
-        self.fingertip_links = {
-            'index': 'rh_fftip',
-            'middle': 'rh_mftip',
-            'ring': 'rh_rftip',
-            'little': 'rh_lftip',
-            'thumb': 'rh_thtip',
-        }
+        self.kdl_chains_middle = {}
+        self.kdl_chains_distal = {}
+        self.kdl_chains_tip = {}
 
-        for name, tip in self.fingertip_links.items():
-            chain = self.tree.getChain('reference', tip)
-            self.kdl_chains[name] = chain
-            fk_solver = PyKDL.ChainFkSolverPos_recursive(chain)
-            ik_solver = PyKDL.ChainIkSolverPos_LMA(chain)
-            self.ik_solvers[name] = ik_solver
-            self.fk_solvers[name] = fk_solver
-            self.get_logger().info(f"KDL chain for {name} has {chain.getNrOfJoints()} joints.")
+        self.ik_solvers_middle = {}
+        self.ik_solvers_distal = {}
+        self.ik_solvers_tip = {}
+
+        self.fk_solvers_middle = {}
+        self.fk_solvers_distal = {}
+        self.fk_solvers_tip = {}
+
+        self.finger_links = {
+            'thumb' : ['rh_thmiddle', 'rh_thdistal', 'rh_thtip'],
+            'index' : ['rh_ffmiddle', 'rh_ffdistal', 'rh_fftip'],
+            'middle': ['rh_mfmiddle', 'rh_mfdistal', 'rh_mftip'],
+            'ring'  : ['rh_rfmiddle', 'rh_rfdistal', 'rh_rftip'],
+            'little': ['rh_lfmiddle', 'rh_lfdistal', 'rh_lftip'],
+        }
+        self.last_q = {finger: None for finger in self.finger_links}
+
+        for finger, segments in self.finger_links.items():
+
+            # Chains
+            middle_chain = self.tree.getChain('reference', segments[0])
+            distal_chain = self.tree.getChain('reference', segments[1])
+            tip_chain    = self.tree.getChain('reference', segments[2])
+
+            self.kdl_chains_middle[finger] = middle_chain
+            self.kdl_chains_distal[finger] = distal_chain
+            self.kdl_chains_tip[finger]    = tip_chain
+
+            # FK Solvers
+            self.fk_solvers_middle[finger] = PyKDL.ChainFkSolverPos_recursive(middle_chain)
+            self.fk_solvers_distal[finger] = PyKDL.ChainFkSolverPos_recursive(distal_chain)
+            self.fk_solvers_tip[finger]    = PyKDL.ChainFkSolverPos_recursive(tip_chain)
+
+            # IK Solvers
+            self.ik_solvers_middle[finger] = PyKDL.ChainIkSolverPos_LMA(middle_chain)
+            self.ik_solvers_distal[finger] = PyKDL.ChainIkSolverPos_LMA(distal_chain)
+            self.ik_solvers_tip[finger]    = PyKDL.ChainIkSolverPos_LMA(tip_chain)
+
+            self.get_logger().info(f"KDL chain for {finger} middle has {middle_chain.getNrOfJoints()} joints.")
+            self.get_logger().info(f"KDL chain for {finger} distal has {distal_chain.getNrOfJoints()} joints.")
+            self.get_logger().info(f"KDL chain for {finger} tip has {tip_chain.getNrOfJoints()} joints.")
+            self.get_logger().info(f"")
 
         self.joint_pub = self.create_publisher(JointState, 'joint_states', 10)
 
@@ -143,7 +170,17 @@ class HandAnimator(Node):
             self.get_logger().warn(f"IK failed for {chain_name}")
             return None
 
-    def solve_position_only_ik(self, chain, fk_solver, target_pos, q_seed=None):
+    def solve_position_only_ik(self, finger, target_pos, q_seed=None, tol=1e-4):
+
+        chain = self.kdl_chains_tip[finger]
+        fk_solver = self.fk_solvers_tip[finger]
+
+        # chain = self.kdl_chains_middle[name]
+        # fk_solver = self.fk_solvers_middle[name] # Remember to correctly format joint outputs when using this
+
+        # chain = self.kdl_chains_distal[name]
+        # fk_solver = self.fk_solvers_distal[name]
+
         n_joints = chain.getNrOfJoints()
 
         if q_seed is None:
@@ -154,17 +191,73 @@ class HandAnimator(Node):
             for i in range(n_joints):
                 q_kdl[i] = q[i]
 
-            frame = PyKDL.Frame()
-            fk_solver.JntToCart(q_kdl, frame)
-            pos = frame.p
-            return np.linalg.norm(np.array([pos[0], pos[1], pos[2]]) - target_pos)
+            error = 0.0
+            fk_frame = PyKDL.Frame()
+
+            fk_solver.JntToCart(q_kdl, fk_frame)
+            # fk_solver.JntToCart(q_kdl, fk_frame, 0)
+            pos = fk_frame.p
+
+            p_vec = np.array([pos[0], pos[1], pos[2]])
+            error += np.linalg.norm(p_vec - target_pos) ** 2
+
+            return error
 
         result = minimize(fk_position_error, q_seed, method='BFGS')
         self.get_logger().info(f"Target: {target_pos}")
         self.get_logger().info(f"Optimized pos error: {fk_position_error(result.x):.4f}")
 
         final_error = fk_position_error(result.x)
-        if result.success or final_error < 1e-4:
+        if result.success or final_error < tol:
+            q_result = PyKDL.JntArray(n_joints)
+            for i in range(n_joints):
+                q_result[i] = result.x[i]
+            return q_result
+        else:
+            self.get_logger().warn(f"IK failed (success={result.success}, error={final_error:.6f})")
+            return None
+        
+    def solve_segment_position_only_ik(self, finger, target_positions, q_seed=None, weights=[1.0, 1.0, 1.0], tol=1e-4):
+
+        n_joints = self.kdl_chains_tip[finger].getNrOfJoints()
+
+        if q_seed is None:
+            q_seed = np.zeros(n_joints)
+
+        def fk_position_error(q):
+            q_kdl = PyKDL.JntArray(n_joints)
+            for i in range(n_joints):
+                q_kdl[i] = q[i]
+
+            error = 0.0
+            fk_frame_middle = PyKDL.Frame()
+            fk_frame_distal = PyKDL.Frame()
+            fk_frame_tip = PyKDL.Frame()
+
+            self.fk_solvers_middle[finger].JntToCart(q_kdl, fk_frame_middle)  
+            self.fk_solvers_distal[finger].JntToCart(q_kdl, fk_frame_distal)  
+            self.fk_solvers_tip[finger].JntToCart(q_kdl, fk_frame_tip)  
+
+            # pos_middle = fk_frame_middle.p
+            pos_distal = fk_frame_distal.p
+            pos_tip    = fk_frame_tip.p
+
+            # p_vec_middle = np.array([pos_middle[0], pos_middle[1], pos_middle[2]])
+            p_vec_distal = np.array([pos_distal[0], pos_distal[1], pos_distal[2]])
+            p_vec_tip    = np.array([pos_tip[0], pos_tip[1], pos_tip[2]])
+
+            # error += weights[0] * (np.linalg.norm(p_vec_middle - target_positions[0]) ** 2)
+            error += weights[1] * (np.linalg.norm(p_vec_distal - target_positions[1]) ** 2)
+            error += weights[2] * (np.linalg.norm(p_vec_tip - target_positions[2]) ** 2)
+
+            return error  # squared total error
+
+        result = minimize(fk_position_error, q_seed, method='BFGS')
+        self.get_logger().info(f"Target: {target_positions}")
+        self.get_logger().info(f"Optimized pos error: {fk_position_error(result.x):.4f}")
+
+        final_error = fk_position_error(result.x)
+        if result.success or final_error < tol:
             q_result = PyKDL.JntArray(n_joints)
             for i in range(n_joints):
                 q_result[i] = result.x[i]
@@ -173,20 +266,13 @@ class HandAnimator(Node):
             self.get_logger().warn(f"IK failed (success={result.success}, error={final_error:.6f})")
             return None
 
-        # if result.success:
-        #     q_result = PyKDL.JntArray(n_joints)
-        #     for i in range(n_joints):
-        #         q_result[i] = result.x[i]
-        #     return q_result
-        # else:
-        #     return None
-
     def timer_callback(self):
         if self.frame >= self.total_frames:
             self.frame = 0  # Loop
 
         hand_chains = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12],
                        [13, 14, 15, 16], [17, 18, 19, 20]]
+
         global_positions = []
 
         for chain in hand_chains:
@@ -211,7 +297,9 @@ class HandAnimator(Node):
             marker.action = Marker.ADD
 
             if self.tuning_mode:
-                pos *= self.scaling_factor
+                pos[0] *= self.scaling_factor['x']
+                pos[1] *= self.scaling_factor['y']
+                pos[2] *= self.scaling_factor['z']
 
             marker.pose.position.x = float(pos[0])
             marker.pose.position.y = float(pos[1])
@@ -226,55 +314,69 @@ class HandAnimator(Node):
         self.publisher.publish(marker_array)
         self.frame += 1
 
-        # target = np.array([0.02, -0.03, 0.18])  # desired position in reference frame
+        joint_prefixes = {
+            'thumb' : 'rh_TH',
+            'index' : 'rh_FF',
+            'middle' : 'rh_MF',
+            'ring' : 'rh_RF',
+            'little' : 'rh_LF',
+        }
+        finger_list = list(joint_prefixes)
 
-        # target = np.array([1.0, 0.0, 0.0])  # desired position in reference frame
-        target = np.array([0.04, -0.05, 0.1])  # desired position in reference frame
+        name_list = []
+        position_list = []
 
-        # target = np.array([0.02, -0.00, 0.0])  # desired position in reference frame
-        # fk_solver = PyKDL.ChainFkSolverPos_recursive(chain)
+        # for i in [1]:
+        for i in range(5):
 
-        q_out_index = self.solve_position_only_ik(self.kdl_chains['index'], self.fk_solvers['index'], target)
-        q_out_thumb = self.solve_position_only_ik(self.kdl_chains['thumb'], self.fk_solvers['thumb'], target)
+            # target = global_positions[4*i + 3]
+            # target[0] *= self.scaling_factor['x']
+            # target[1] *= self.scaling_factor['y']
+            # target[2] *= self.scaling_factor['z']
 
-        if q_out_index and q_out_thumb:
-            msg = JointState()
-            msg.header.stamp = self.get_clock().now().to_msg()
+            # target = np.array([0.04, -0.05, 0.1])
+            # target = np.array([0.04, -0.02, 0.1])
 
-            name_list = [f"rh_FFJ{i}" for i in range(q_out_index.rows(), 0, -1)] + [f"rh_THJ{i}" for i in range(q_out_thumb.rows(), 0, -1)]
-            msg.name = name_list
+            target = [
+                global_positions[4 * i + 1] * self.scaling_factor['x'],  # middle
+                global_positions[4 * i + 2] * self.scaling_factor['y'],  # distal
+                global_positions[4 * i + 3] * self.scaling_factor['z']   # fingertip
+            ]
+            # target = [
+            #     np.array([0.04, -0.05, 0.1]),
+            #     np.array([0.04, -0.04, 0.11]),
+            #     np.array([0.04, -0.05, 0.1]),
+            # ] 
 
-            # self.get_logger().info(f"{msg.name}")
+            q_seed = self.last_q[finger_list[i]]
+            # q_out = self.solve_position_only_ik(
+            #     finger_list[i],
+            #     target,
+            #     q_seed=q_seed
+            # )
+            q_out = self.solve_segment_position_only_ik(
+                finger_list[i],
+                target,
+                q_seed=q_seed,
+                weights=[1.0, 1.0, 1.0]
+            )
 
-            pos_list = [q_out_index[i] for i in range(q_out_index.rows())] + [q_out_thumb[i] for i in range(q_out_thumb.rows())]
+            if q_out is not None:
+                self.last_q[finger_list[i]] = np.array([q_out[j] for j in range(q_out.rows())])
 
-            msg.position = pos_list
-            # self.get_logger().info(f"{msg.position}")
+            name_list += [f"{joint_prefixes[finger_list[i]]}J{idx}" for idx in range(q_out.rows(), 0, -1)]
+            position_list += [q_out[idx] for idx in range(q_out.rows())]
+        
+        name_list.append('rh_WRJ1')
+        name_list.append('rh_WRJ2')
+        position_list.append(0.0)
+        position_list.append(0.0)
 
-            self.joint_pub.publish(msg)
-
-        # # IK
-        # for pos in [global_positions[i] for i in [chain[-1] for chain in hand_chains]]:
-        #     pose_stamped = PoseStamped()
-        #     pose_stamped.header.frame_id = 'world'
-        #     pose_stamped.pose.position.x = float(pos[0])
-        #     pose_stamped.pose.position.y = float(pos[1])
-        #     pose_stamped.pose.position.z = float(pos[2])
-        #     pose_stamped.pose.orientation.w = 1.0  # Dummy
-
-        #     # Transform to 'reference' frame
-        #     try:
-        #         tf = self.tf_buffer.lookup_transform('reference', 'world', rclpy.time.Time())
-        #         pose_in_ref = do_transform_pose(pose_stamped, tf)
-        #         q_out = self.solve_ik('index', pose_in_ref)
-        #         if q_out:
-        #             msg = JointState()
-        #             msg.header.stamp = self.get_clock().now().to_msg()
-        #             msg.name = [f"index_joint_{i+1}" for i in range(q_out.rows())]
-        #             msg.position = [q_out[i] for i in range(q_out.rows())]
-        #             self.joint_pub.publish(msg)
-        #     except Exception as e:
-        #         self.get_logger().warn(f"TF or IK failed: {e}")
+        msg = JointState()
+        msg.header.stamp = self.get_clock().now().to_msg()
+        msg.name = name_list
+        msg.position = position_list
+        self.joint_pub.publish(msg)
 
     def quaternion_rotate(self, v, q):
         q = np.array([q[0], q[1], q[2], q[3]])
