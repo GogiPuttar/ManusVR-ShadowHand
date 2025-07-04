@@ -23,8 +23,10 @@ https://github.com/user-attachments/assets/04cc70e6-ae19-4ee7-9ca7-9ae67832159a
 - Currently, does not care about the pose of the finger, that's why sometimes you see the finger twist around. Joint-wise weighting can be added.
 
 ### Tip-Only IK:
+https://github.com/user-attachments/assets/ac022014-75cc-446a-8c52-2db2a683cc90
 
 ### Segment-wise IK:
+https://github.com/user-attachments/assets/43832bee-6af8-4fbd-b4e0-add73fe6bdcb
 
 # Implementation
 
