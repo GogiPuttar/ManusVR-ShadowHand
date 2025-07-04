@@ -106,10 +106,10 @@ https://github.com/user-attachments/assets/43832bee-6af8-4fbd-b4e0-add73fe6bdcb
 
 # Implementation
 
-## `scripts/aniamte_skeleton.py`
+## `scripts/animate_skeleton.py`
 
 Simple script for Manus VR glove position reconstruction and animation using quaternion math.
-`data` and `animate_skeleton.py` have been provided by [Futurhand Robotics](https://futurhandrobotics.com/).
+`data` and `animate_skeleton.py` have been provided by [FuturHand Robotics](https://futurhandrobotics.com/).
 ```
 python3 scripts/animate_skeleton.py data/skeleton_log_20250624_203941.csv
 ```
