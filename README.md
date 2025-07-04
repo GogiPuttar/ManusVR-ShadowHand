@@ -40,11 +40,11 @@ where,
 
 $Z_{tip}(q) = (x_{d,tip} - FK_{tip}(q))^2$ is the cost function,
 
-$x_{d,tip} \in \real^3$ is the desired fingertip position,
+$x_{d,tip} \in ℝ^3$ is the desired fingertip position,
 
 $FK_{tip}(q)$ is the Cartesian Forward Kinematics function for that finger, and
 
-$q \in \real^n$ is the vector of joint angles ($n$ is the DoF for that finger).
+$q \in ℝ^n$ is the vector of joint angles ($n$ is the DoF for that finger).
 
 https://github.com/user-attachments/assets/ac022014-75cc-446a-8c52-2db2a683cc90
 
