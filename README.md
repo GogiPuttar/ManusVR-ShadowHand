@@ -33,9 +33,11 @@ I've implemented my own IK solver as follows:
 Position only IK for the tip is defined as the unconstrained optimization problem:
 
 For each finger:
+
 $
 \min_{q} Z_{tip}
 $
+
 where,
 $$
   Z_{tip} = (x_{d,tip} - FK_{tip}(q))^2
