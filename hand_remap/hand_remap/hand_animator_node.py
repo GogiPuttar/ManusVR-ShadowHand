@@ -48,7 +48,7 @@ class HandAnimator(Node):
 
         self.node_positions, self.node_orientations = self.load_data(csv_path)
         self.total_frames = self.node_positions.shape[0]
-        self.get_logger().info(f"Loaded {self.total_frames} frames")
+        self.get_logger().debug(f"Loaded {self.total_frames} frames")
 
         self.colors = [ColorRGBA(r=0.0, g=1.0, b=1.0, a=1.0), # cyan
                        ColorRGBA(r=0.0, g=1.0, b=0.0, a=1.0), # green
@@ -112,10 +112,10 @@ class HandAnimator(Node):
             self.ik_solvers_distal[finger] = PyKDL.ChainIkSolverPos_LMA(distal_chain)
             self.ik_solvers_tip[finger]    = PyKDL.ChainIkSolverPos_LMA(tip_chain)
 
-            self.get_logger().info(f"KDL chain for {finger} middle has {middle_chain.getNrOfJoints()} joints.")
-            self.get_logger().info(f"KDL chain for {finger} distal has {distal_chain.getNrOfJoints()} joints.")
-            self.get_logger().info(f"KDL chain for {finger} tip has {tip_chain.getNrOfJoints()} joints.")
-            self.get_logger().info(f"")
+            self.get_logger().debug(f"KDL chain for {finger} middle has {middle_chain.getNrOfJoints()} joints.")
+            self.get_logger().debug(f"KDL chain for {finger} distal has {distal_chain.getNrOfJoints()} joints.")
+            self.get_logger().debug(f"KDL chain for {finger} tip has {tip_chain.getNrOfJoints()} joints.")
+            self.get_logger().debug(f"")
 
         self.joint_pub = self.create_publisher(JointState, 'joint_states', 10)
 
@@ -141,11 +141,11 @@ class HandAnimator(Node):
         def recurse(link, indent=''):
             children = [j for j in self.robot.joints if j.parent == link]
             for joint in children:
-                logger.info(f"{indent}- {joint.child}  (joint: {joint.name}, type: {joint.type})")
+                logger.debug(f"{indent}- {joint.child}  (joint: {joint.name}, type: {joint.type})")
                 recurse(joint.child, indent + '  ')
 
-        logger.info(f"🤖 URDF Robot: {self.robot.name}")
-        logger.info(f"📦 URDF Link Tree:")
+        logger.debug(f"🤖 URDF Robot: {self.robot.name}")
+        logger.debug(f"📦 URDF Link Tree:")
         recurse(self.robot.get_root())
 
     def solve_ik(self, chain_name, pose_in_ref):
@@ -204,8 +204,8 @@ class HandAnimator(Node):
             return error
 
         result = minimize(fk_position_error, q_seed, method='BFGS')
-        self.get_logger().info(f"Target: {target_pos}")
-        self.get_logger().info(f"Optimized pos error: {fk_position_error(result.x):.4f}")
+        self.get_logger().debug(f"Target: {target_pos}")
+        self.get_logger().debug(f"Optimized pos error: {fk_position_error(result.x):.4f}")
 
         final_error = fk_position_error(result.x)
         if result.success or final_error < tol:
@@ -253,8 +253,8 @@ class HandAnimator(Node):
             return error  # squared total error
 
         result = minimize(fk_position_error, q_seed, method='BFGS')
-        self.get_logger().info(f"Target: {target_positions}")
-        self.get_logger().info(f"Optimized pos error: {fk_position_error(result.x):.4f}")
+        self.get_logger().debug(f"Target: {target_positions}")
+        self.get_logger().debug(f"Optimized pos error: {fk_position_error(result.x):.4f}")
 
         final_error = fk_position_error(result.x)
         if result.success or final_error < tol:
@@ -337,11 +337,19 @@ class HandAnimator(Node):
             # target = np.array([0.04, -0.05, 0.1])
             # target = np.array([0.04, -0.02, 0.1])
 
-            target = [
-                global_positions[4 * i + 1] * self.scaling_factor['x'],  # middle
-                global_positions[4 * i + 2] * self.scaling_factor['y'],  # distal
-                global_positions[4 * i + 3] * self.scaling_factor['z']   # fingertip
-            ]
+            if not self.tuning_mode:
+                target = [
+                    global_positions[4 * i + 1] * self.scaling_factor['x'],  # middle
+                    global_positions[4 * i + 2] * self.scaling_factor['y'],  # distal
+                    global_positions[4 * i + 3] * self.scaling_factor['z']   # fingertip
+                ]
+            else:
+                target = [
+                    global_positions[4 * i + 1],  # middle
+                    global_positions[4 * i + 2],  # distal
+                    global_positions[4 * i + 3]   # fingertip
+                ]
+
             # target = [
             #     np.array([0.04, -0.05, 0.1]),
             #     np.array([0.04, -0.04, 0.11]),

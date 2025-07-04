@@ -8,7 +8,11 @@ reference_to_manus:
   qw: 1.0
 mode: "IK" # "IK" | "Scaled"
 scaling_factor: 
-  x: 1.4
+  # x: 1.4
+  # y: 1.4
+  # z: 1.3
+  x: 1.7
   y: 1.4
-  z: 1.3
+  z: 1.55
+
 tuning_mode: false # Set this to true while tuning scaling_factor and 

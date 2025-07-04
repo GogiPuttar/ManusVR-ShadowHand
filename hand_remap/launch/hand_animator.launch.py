@@ -31,6 +31,16 @@ def generate_launch_description():
         )
     }
 
+    # Split argument into directory and filename
+    csv_filename_arg = DeclareLaunchArgument(
+        'csv_filename',
+        default_value='skeleton_log_20250624_203229.csv',
+        description='CSV file name'
+    )
+    csv_filename = LaunchConfiguration('csv_filename')
+
+    csv_path = PathJoinSubstitution([data_dir, csv_filename])
+
     # Hand robot state publisher
     hand_rsp = Node(
         package='robot_state_publisher',
@@ -48,15 +58,18 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             'tracking_path',
-            default_value='true',
+            default_value='',
             description='Settings for motion tracking'
         ),
+        csv_filename_arg,
         Node(
             package='hand_remap',
             executable='hand_animator_node',
             name='hand_animator',
             parameters=[{
-                'csv_path': os.path.join(data_dir, 'skeleton_log_20250624_203229.csv'),
+                # 'csv_path': os.path.join(data_dir, 'skeleton_log_20250624_203229.csv'),
+                # 'csv_path': os.path.join(data_dir, ParameterValue(csv_path, value_type=str)),
+                'csv_path': csv_path,
                 'tracking_path': os.path.join(config_dir, 'tracking_params.yaml'),
                 **hand_robot_description,
                 }],

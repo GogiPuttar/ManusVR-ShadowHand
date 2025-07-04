@@ -81,10 +81,6 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        manus:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
         reference:
           Alpha: 1
           Show Axes: false
@@ -251,131 +247,19 @@ Visualization Manager:
       Value: true
       Visual Enabled: true
     - Class: rviz_default_plugins/TF
-      Enabled: true
+      Enabled: false
       Frame Timeout: 15
       Frames:
         All Enabled: true
-        base_link:
-          Value: true
-        manus:
-          Value: true
-        reference:
-          Value: true
-        rh_ffdistal:
-          Value: true
-        rh_ffknuckle:
-          Value: true
-        rh_ffmiddle:
-          Value: true
-        rh_ffproximal:
-          Value: true
-        rh_fftip:
-          Value: true
-        rh_forearm:
-          Value: true
-        rh_imu:
-          Value: true
-        rh_lfdistal:
-          Value: true
-        rh_lfknuckle:
-          Value: true
-        rh_lfmetacarpal:
-          Value: true
-        rh_lfmiddle:
-          Value: true
-        rh_lfproximal:
-          Value: true
-        rh_lftip:
-          Value: true
-        rh_manipulator:
-          Value: true
-        rh_mfdistal:
-          Value: true
-        rh_mfknuckle:
-          Value: true
-        rh_mfmiddle:
-          Value: true
-        rh_mfproximal:
-          Value: true
-        rh_mftip:
-          Value: true
-        rh_palm:
-          Value: true
-        rh_rfdistal:
-          Value: true
-        rh_rfknuckle:
-          Value: true
-        rh_rfmiddle:
-          Value: true
-        rh_rfproximal:
-          Value: true
-        rh_rftip:
-          Value: true
-        rh_thbase:
-          Value: true
-        rh_thdistal:
-          Value: true
-        rh_thhub:
-          Value: true
-        rh_thmiddle:
-          Value: true
-        rh_thproximal:
-          Value: true
-        rh_thtip:
-          Value: true
-        rh_wrist:
-          Value: true
       Marker Scale: 0.10000000149011612
       Name: TF
       Show Arrows: true
       Show Axes: true
       Show Names: false
       Tree:
-        base_link:
-          rh_forearm:
-            rh_wrist:
-              rh_palm:
-                reference:
-                  manus:
-                    {}
-                rh_ffknuckle:
-                  rh_ffproximal:
-                    rh_ffmiddle:
-                      rh_ffdistal:
-                        rh_fftip:
-                          {}
-                rh_imu:
-                  {}
-                rh_lfmetacarpal:
-                  rh_lfknuckle:
-                    rh_lfproximal:
-                      rh_lfmiddle:
-                        rh_lfdistal:
-                          rh_lftip:
-                            {}
-                rh_manipulator:
-                  {}
-                rh_mfknuckle:
-                  rh_mfproximal:
-                    rh_mfmiddle:
-                      rh_mfdistal:
-                        rh_mftip:
-                          {}
-                rh_rfknuckle:
-                  rh_rfproximal:
-                    rh_rfmiddle:
-                      rh_rfdistal:
-                        rh_rftip:
-                          {}
-                rh_thbase:
-                  rh_thproximal:
-                    rh_thhub:
-                      rh_thmiddle:
-                        rh_thdistal:
-                          rh_thtip:
-                            {}
+        {}
       Update Interval: 0
-      Value: true
+      Value: false
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -429,7 +313,7 @@ Visualization Manager:
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.05000000074505806
+        X: -0.10000000149011612
         Y: 0
         Z: 0
       Focal Shape Fixed Size: true
@@ -437,10 +321,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.3297971189022064
+      Pitch: 0.264797180891037
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 5.323584079742432
+      Yaw: 4.723572254180908
     Saved: ~
 Window Geometry:
   Displays:
