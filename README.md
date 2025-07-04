@@ -16,6 +16,8 @@ https://github.com/user-attachments/assets/0624f13a-9e5d-4638-8620-6eaa8df2d4e7
 ros2 launch hand_remap hand_animator.launch.py csv_filename:=skeleton_log_20250624_203229.csv
 ```
 
+<br>
+
 # Mathematical Foundation
 
 ## Remapping
@@ -24,7 +26,7 @@ Since the Manus VR glove and the Shadow Hand have a similar tree structure with 
 
 $Y = T(X)$
 
-Since it is important to preserve addition (Eg. offsets to any positions) and scaling, I propose using using an invertible $3⨯3$ linear transformation $S$, such that:
+Since it is important to preserve addition (Eg. offsets to any positions) and scaling (Eg. lengthening of any relative positions), I propose using using an invertible $3⨯3$ linear transformation $S$, such that:
 
 $Y = SX$
 
@@ -32,6 +34,8 @@ This is a general transformer that preserves collinearity, parallelism and origi
 Since tuning 9 different values is tough, I've decided to use a simple scaling matrix $S = diag(s_x, s_y, s_z)$ where $s_x$, $s_y$, and $s_z$ are the respective scaling factors for $x$, $y$, and $z$ axes.
 
 https://github.com/user-attachments/assets/04cc70e6-ae19-4ee7-9ca7-9ae67832159a
+
+<br>
 
 ## Inverse Kinematics
 
@@ -98,10 +102,13 @@ https://github.com/user-attachments/assets/43832bee-6af8-4fbd-b4e0-add73fe6bdcb
 - Since the search space is unconstrained, the optimizer has no issues with values outside the workspace due to joint limits, again giving us a clean solution limited by the renderer's (`robot_state_publisher`) joint limits.
 - Since this is position-only, sometimes you see the fingers twisting around which is undesriable. The optimizer can be modified to penalize joint twisting.
 
+<br>
+
 # Implementation
 
 ## `scripts/aniamte_skeleton.py`
 
+Simple script for Manus VR glove position reconstruction and animation using quaternion math.
 `data` and `animate_skeleton.py` have been provided by [Futurhand Robotics](https://futurhandrobotics.com/).
 ```
 python3 scripts/animate_skeleton.py data/skeleton_log_20250624_203941.csv
@@ -111,12 +118,17 @@ https://github.com/user-attachments/assets/fdc4988d-ea6c-4606-aa97-6befc9a6492a
 
 ## `hand_remap` package
 
+ROS 2 package that simulates remapping Manus VR measurements onto a ShadowRobot Hand in real time.
+
 ```
 ros2 launch hand_remap hand_animator.launch.py csv_filename:=skeleton_log_20250624_203229.csv
 ```
 
 ## `sr_description` pacakge
 
+ROS 2 package that stores the relevant `urdf` and `xacro` files for simualting a ShadowRobot Hand.
+
+<br>
 
 # Setup
 
@@ -137,10 +149,14 @@ ros2 launch hand_remap hand_animator.launch.py csv_filename:=skeleton_log_202506
   rm -rf sr_common/
   ```
 
+<br>
+
 # Limitations
 - Does not account for self collisions, although good remapping and IK can minimize the possibility of self collisions. 
 Can be baked into the IK optimizer, possibly as a Gaussian Mixture Model.
 - Only accounts for joint limits, but does not account for actuator gains, damping or any other real world considerations.
+
+<br>
 
 # Use of AI Tools
 ChatGPT was used in this project for creating protoype scripts
