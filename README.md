@@ -34,9 +34,7 @@ Position only IK for the tip is defined as the unconstrained optimization proble
 
 For each finger:
 
-$
-\min_{q} Z_{tip}
-$
+$\min_{q} Z_{tip}$
 
 where,
 $$
